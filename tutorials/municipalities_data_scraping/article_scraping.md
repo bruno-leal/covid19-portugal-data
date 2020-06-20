@@ -180,6 +180,7 @@ tables = tabula.read_pdf(
 Then, we can concatenate them into a single table containing all the data, perform some data cleaning and column renaming using **pandas** and finally we get a cleaned tidy table with all the info - concerning the municipalities - from the report.
 
 ```python
+# Concatenate the five subtables
 full_table = pd.concat(
     [
         tables[0],
@@ -190,6 +191,7 @@ full_table = pd.concat(
     ]
 ).reset_index()
 
+# Rename columns
 full_table = full_table.rename(
     columns={
         "CONCELHO": "concelho",
@@ -197,13 +199,17 @@ full_table = full_table.rename(
     }
 )
 
+# Clean municipality names that contain 'newlines'
 full_table = full_table.assign(concelho = full_table.concelho.replace(r'\r',  ' ', regex=True))
 
+# Filter only the relevant columns
 full_table = full_table.filter(["concelho", "confirmados"])
 ```
 
 The result should look like this:
 
 ![Pandas DataFrame with the exported data](img/8_exported_data.png)
+
+Done!
 
 All code used in this article is available in this repository.
