@@ -121,7 +121,7 @@ The next step is to scrape the PDF file and extract the data we want - in this c
 
 This is the tricky part.
 
-The table containing the data we want is on the third page of the report. We could simply try to scrape the data from the whole page, but that would mean that we would get some trash or noise that we would have to clean afterwards. So, the best option is to define the area of the page we want to read by defining its coordinates. But how to calculate them? One option would be to use a PDF editor that has the ability to do it. Another one is to use the standalone executable of **Tabula**, that you can download from https://tabula.technology/.
+The table containing the data we want is on the third page of the report. We could simply try to scrape the data from the whole page, but that would mean that we would get some trash or noise that we would have to clean afterwards. So, the best option is to define the area of the page we want to read by defining its coordinates. But how to calculate them? One option would be to use a PDF editor that has the ability to do it. Another one is to use the stand-alone executable of **Tabula**, that you can download from https://tabula.technology/.
 
 Download, unzip and run the tool. Then it should open on your browser and you should see something like this.
 
@@ -135,21 +135,21 @@ Then, click on "Preview & Export Extracted Data" and you should see the results 
 
 Tabula uses two different methods to extract the data: Stream and Lattice. While Stream method looks for whitespaces between columns of a table, Lattice approach looks for boundaries between columns.
 
-Stream method does not work very well with these reports; so it's better to use Lattice. Apparently it works well. Tabula is even able to understand that, although the table is composed by five «subtables» (each containing two columns - "CONCELHO" and "NÚMERO DE CASOS"), all the data belongs to the same table and can merge it.
+Stream method does not work very well with these reports; so it's better to use Lattice. Apparently it works well. Tabula is even able to understand that, although the table is composed by five subtables (each containing two columns - "CONCELHO" and "NÚMERO DE CASOS"), all the data belongs to the same table and can merge it.
 
 Unfortunately that doesn't work perfectly. Remember this was the tricky part? If you scroll down the extraction preview, you will notice that there are some municipalities missing.
 
 ![Extracted data is missing some municipalities](img/4_tabula_missing_municipalities.png)
 
-So something's not working very well. And tipically, if you try to preview another report (like from a few days earlier), you'll notice that the same municipalities will be missing. Therefore, there must be something in the PDF's content that is contributing to this problem; something related with the position of those municipalities in the table.
+So something's not working very well. And typically, if you try to preview another report (like from a few days earlier), you'll notice that the same municipalities will be missing. Therefore, there must be something in the PDF's content that is contributing to this problem; something related with the position of those municipalities in the table.
 
-But there is an alternative approach. The tricky part of scraping PDF files is that we may need to do some adjustments. Instead of trying to scrape all the data from the table at once, we could try to scrape each of the five «subtables». That way, just like magic, all the data is scraped successfully.
+But there is an alternative approach. The tricky part of scraping PDF files is that we may need to do some adjustments. Instead of trying to scrape all the data from the table at once, we could try to scrape each of the five subtables. That way, just like magic, all the data is scraped successfully.
 
 ![Report's municipalities data alternative selection](img/5_tabula_selection_tables.png)
 
 ![Extracted data contains all data from municipalities table](img/6_tabula_all_municipalities.png)
 
-So what now? We want to be able to programmatically scrape data from future reports without needing to execute this manual work, right? Then, we could use the "Export" functionality, but instead of exporting the data itself, exporting a Json file with the dimensions / coordinates, by changing the **Export Format** to *JSON (dimensions)*.
+So what now? We want to be able to programmatically scrape data from future reports without needing to execute this manual work, right? Then, we could use the "Export" functionality, but instead of exporting the data itself, exporting a JSON file with the dimensions / coordinates, by changing the **Export Format** to *JSON (dimensions)*.
 
 The exported file should look something like this.
 
@@ -161,10 +161,8 @@ We can copy the x1, x2, y1, y2 coordinates and use them to programmatically read
 # Import required libraries
 import tabula
 import pandas as pd
-```
 
-```python
-# Get the five «subtables»
+# Get the five subtables
 tables = tabula.read_pdf(
     path,
     lattice=True,
@@ -179,7 +177,7 @@ tables = tabula.read_pdf(
 )
 ```
 
-Then, we can concatenate them into a single table containing all the data, perform some data cleaning and column renaming using **pandas** and finally we get a cleaned tidy table with all the info - concernig the municipalities - from the report.
+Then, we can concatenate them into a single table containing all the data, perform some data cleaning and column renaming using **pandas** and finally we get a cleaned tidy table with all the info - concerning the municipalities - from the report.
 
 ```python
 full_table = pd.concat(
