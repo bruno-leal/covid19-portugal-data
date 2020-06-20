@@ -1,4 +1,4 @@
-# Data scraping with Python: a COVID-19 practical example
+# Data scraping with Python: a practical example with COVID-19 data
 
 When it comes to data science, there is a natural tendency to think of the glamorous part of it, like beautiful charts, interactive dashboards, machine learning and some advanced applications of it.
 
