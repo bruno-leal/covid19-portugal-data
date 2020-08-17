@@ -16,3 +16,7 @@ print("Done. Saved to: " + today_municipalities_data_filepath)
 print("Adding new data to database...")
 utils.append_new_municipalities_data(utils.get_report_filename_from_url(today_report_url))
 print("Done.")
+
+print("Checking new data for incongruities...")
+utils.check_new_municipalities_data(utils.get_report_filename_from_url(today_report_url))
+print("Done.")

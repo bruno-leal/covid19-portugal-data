@@ -82,12 +82,13 @@ def scrap_municipalities_data_from_report(file_path):
 		pages='3',
 		# encoding='utf-8',
 		area = [
-			[189.27165699005127, 35.325751304626465, 750.0214776992798, 139.4437551498413],
-			[189.27165699005127, 143.1622552871704, 750.0214776992798, 247.28025913238525],
-			[189.27165699005127, 250.25505924224854, 750.0214776992798, 352.88566303253174],
-			[189.27165699005127, 355.1167631149292, 750.0214776992798, 453.2851667404175],
-			[189.27165699005127, 456.25996685028076, 750.0214776992798, 562.6090707778931]
-		]
+			[121.59490909881424, 22.6084762957762, 712.0927309066756, 131.18868030578597],
+			[121.59490909881424, 133.41978038818343, 712.0927309066756, 239.76888431579573],
+			[121.59490909881424, 241.9999843981932, 712.0927309066756, 349.0927883532713],
+			[121.59490909881424, 352.8112884906004, 712.0927309066756, 457.6729923632811],
+			[121.59490909881424, 460.64779247314436, 712.0927309066756, 571.4590965655516]
+		],
+		pandas_options={'header': None}
 	)
 
 	full_table = pd.concat(
@@ -102,8 +103,8 @@ def scrap_municipalities_data_from_report(file_path):
 
 	full_table = full_table.rename(
 		columns={
-			"CONCELHO": "concelho",
-			"NÚMERO\rDE CASOS": "confirmados"
+			0: "concelho",
+			1: "confirmados"
 		}
 	)
 
@@ -148,3 +149,26 @@ def append_new_municipalities_data(new_municipalities_data_path):
 	)
 
 	municipalities_data_merged.to_excel(municipalities_data_path, index=False)
+
+
+def check_new_municipalities_data(new_municipalities_data_path):
+	municipalities_data_path = build_file_path(LOCAL_DATA_PATH, MUNICIPALITIES_DATA_FILENAME, "xlsx")
+
+	municipalities_data = pd.read_excel(
+		municipalities_data_path,
+		dtype={"distrito_ilha": str, "codigo": str}
+	)
+
+	last_columns = municipalities_data.T.tail(2).index.values
+
+	recent_municipalities_data = municipalities_data.filter(
+		[
+			"concelho",
+			last_columns[0],
+			last_columns[1]
+		]
+	)
+	incongruous_data = recent_municipalities_data.loc[recent_municipalities_data[last_columns[1]].isna()].loc[recent_municipalities_data[last_columns[0]].gt(0)]
+
+	print("Incongruous new data detected for:")
+	print(incongruous_data)
