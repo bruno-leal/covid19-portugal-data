@@ -9,7 +9,7 @@ import pandas as pd
 
 ## TODO: config file
 REPORTS_URL = "https://covid19.min-saude.pt/relatorio-de-situacao"
-LOCAL_REPORTS_PATH = """
+LOCAL_REPORTS_PATH = ""
 LOCAL_DATA_PATH = ""
 MUNICIPALITIES_DATA_FILENAME = "time_series_covid19_portugal_confirmados_concelhos"
 
