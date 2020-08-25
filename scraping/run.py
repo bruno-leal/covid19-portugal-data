@@ -13,10 +13,11 @@ print("Scraping municipalities data from report...")
 today_municipalities_data_filepath = utils.scrap_municipalities_data_from_report(today_report_filepath)
 print("Done. Saved to: " + today_municipalities_data_filepath)
 
-print("Adding new data to database...")
-utils.append_new_municipalities_data(utils.get_report_filename_from_url(today_report_url))
-print("Done.")
+if today_municipalities_data_filepath != "":
+	print("Adding new data to database...")
+	utils.append_new_municipalities_data(utils.get_report_filename_from_url(today_report_url))
+	print("Done.")
 
-print("Checking new data for incongruities...")
-utils.check_new_municipalities_data(utils.get_report_filename_from_url(today_report_url))
-print("Done.")
+	print("Checking new data for incongruities...")
+	utils.check_new_municipalities_data(utils.get_report_filename_from_url(today_report_url))
+	print("Done.")

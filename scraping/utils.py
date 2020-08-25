@@ -3,13 +3,14 @@ import requests
 from datetime import date
 
 import tabula
+from PyPDF2 import PdfFileReader
 import pandas as pd
 
 
 ## TODO: config file
 REPORTS_URL = "https://covid19.min-saude.pt/relatorio-de-situacao"
-LOCAL_REPORTS_PATH = "E:/Estudos/COVID-19/DGS"
-LOCAL_DATA_PATH = "E:/Estudos/COVID-19/covid19-portugal-data"
+LOCAL_REPORTS_PATH = """
+LOCAL_DATA_PATH = ""
 MUNICIPALITIES_DATA_FILENAME = "time_series_covid19_portugal_confirmados_concelhos"
 
 
@@ -76,51 +77,59 @@ def download_report(url):
 
 # SCRAP MUNICIPALITIES DATA FROM A GIVEN DGS'S REPORT AND SAVE IT TO A CSV
 def scrap_municipalities_data_from_report(file_path):
-	tables = tabula.read_pdf(
-		file_path,
-		lattice=True,
-		pages='3',
-		# encoding='utf-8',
-		area = [
-			[121.59490909881424, 22.6084762957762, 712.0927309066756, 131.18868030578597],
-			[121.59490909881424, 133.41978038818343, 712.0927309066756, 239.76888431579573],
-			[121.59490909881424, 241.9999843981932, 712.0927309066756, 349.0927883532713],
-			[121.59490909881424, 352.8112884906004, 712.0927309066756, 457.6729923632811],
-			[121.59490909881424, 460.64779247314436, 712.0927309066756, 571.4590965655516]
-		],
-		pandas_options={'header': None}
-	)
+	pdf = PdfFileReader(open(file_path, "rb"))
+	pages = pdf.getNumPages()
 
-	full_table = pd.concat(
-		[
-			tables[0],
-			tables[1],
-			tables[2],
-			tables[3],
-			tables[4]
-		]
-	).reset_index()
+	csv_path = ""
 
-	full_table = full_table.rename(
-		columns={
-			0: "concelho",
-			1: "confirmados"
-		}
-	)
+	if pages < 3:
+		print("O relatório não contém informação relativa aos concelhos.")
+	else:
+		tables = tabula.read_pdf(
+			file_path,
+			lattice=True,
+			pages='3',
+			# encoding='utf-8',
+			area = [
+				[121.59490909881424, 22.6084762957762, 712.0927309066756, 131.18868030578597],
+				[121.59490909881424, 133.41978038818343, 712.0927309066756, 239.76888431579573],
+				[121.59490909881424, 241.9999843981932, 712.0927309066756, 349.0927883532713],
+				[121.59490909881424, 352.8112884906004, 712.0927309066756, 457.6729923632811],
+				[121.59490909881424, 460.64779247314436, 712.0927309066756, 571.4590965655516]
+			],
+			pandas_options={'header': None}
+		)
 
-	full_table = full_table.assign(concelho = full_table.concelho.replace(r'\r',  ' ', regex=True))
+		full_table = pd.concat(
+			[
+				tables[0],
+				tables[1],
+				tables[2],
+				tables[3],
+				tables[4]
+			]
+		).reset_index()
 
-	full_table = full_table.filter(["concelho", "confirmados"])
+		full_table = full_table.rename(
+			columns={
+				0: "concelho",
+				1: "confirmados"
+			}
+		)
 
-	path = build_file_path(
-		LOCAL_REPORTS_PATH,
-		get_report_filename_from_url(file_path),
-		'csv'
-	)
+		full_table = full_table.assign(concelho = full_table.concelho.replace(r'\r',  ' ', regex=True))
 
-	full_table.to_csv(path, encoding='utf-16', index=False)
+		full_table = full_table.filter(["concelho", "confirmados"])
 
-	return path
+		csv_path = build_file_path(
+			LOCAL_REPORTS_PATH,
+			get_report_filename_from_url(file_path),
+			'csv'
+		)
+
+		full_table.to_csv(csv_path, encoding='utf-16', index=False)
+
+	return csv_path
 
 
 def append_new_municipalities_data(new_municipalities_data_path):
